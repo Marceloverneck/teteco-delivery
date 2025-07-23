@@ -51,12 +51,40 @@ function addToCart(i) {
   renderCart();
 }
 
+// Função para detectar dispositivo móvel
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 whatsAppBtn.addEventListener('click', () => {
-  let msg = "Olá, gostaria de pedir:\n";
-  cart.forEach(item => { msg += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`; });
-  msg += `Total: R$ ${cart.reduce((s, x) => s + x.price, 0).toFixed(2)}`;
-  window.open(`https://wa.me/5521997291267?text=${encodeURIComponent(msg)}`, '_blank');
+  // Pede o nome do cliente
+  const customerName = prompt("Por favor, digite seu nome:");
+
+  // Data e hora atuais
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("pt-BR");
+  const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+  // Monta a mensagem
+  let message = `*Novo Pedido*\n`;
+  message += `Cliente: ${customerName}\n`;
+  message += `Data: ${dateStr} ${timeStr}\n\n`;
+  cart.forEach(item => {
+    message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`;
+  });
+  const total = cart.reduce((sum, i) => sum + i.price, 0).toFixed(2);
+  message += `\nTotal: R$ ${total}`;
+
+  // Escolhe o link correto (app ou web)
+  const phone = "5521997291267";
+  const encodedMessage = encodeURIComponent(message);
+  const url = isMobile()
+    ? `whatsapp://send?phone=${phone}&text=${encodedMessage}`
+    : `https://web.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`;
+
+  window.open(url, '_blank');
 });
+
 
 adminLoginBtn.addEventListener('click', () => {
   const pwd = prompt("Digite a senha de administrador:");
