@@ -8,17 +8,22 @@ const logoutBtn       = document.getElementById('logoutBtn');
 const adminDishList   = document.getElementById('adminDishList');
 
 let isAdmin = false;
-let menu    = JSON.parse(localStorage.getItem('menu')) || [
-  { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99 },
-  { name: "Risoto de Camarão", desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99 }
+let menu = JSON.parse(localStorage.getItem('menu')) || [
+  { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99, image: "" },
+  { name: "Risoto de Camarão",   desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
+];
 ];
 let cart    = [];
 
 function renderMenu() {
   menuContainer.innerHTML = "";
   menu.forEach((item, i) => {
-    const div = document.createElement('div');
+    const div    = document.createElement('div');
+    const srcImg = item.image && item.image.trim() !== "" 
+                   ? item.image 
+                   : 'https://via.placeholder.com/600x400';
     div.innerHTML = `
+      <img src="${srcImg}" alt="${item.name}">
       <h3>${item.name} – R$ ${item.price.toFixed(2)}</h3>
       <p>${item.desc}</p>
       <button onclick="addToCart(${i})">Adicionar</button>
@@ -27,6 +32,7 @@ function renderMenu() {
   });
   if (isAdmin) renderAdminMenu();
 }
+
 
 function renderCart() {
   cartContainer.innerHTML = "";
@@ -82,15 +88,17 @@ function renderAdminMenu() {
     adminDishList.appendChild(li);
   });
 }
-
 function addNewDish() {
-  const n = document.getElementById('newDishName').value;
-  const d = document.getElementById('newDishDesc').value;
-  const p = parseFloat(document.getElementById('newDishPrice').value);
+  const n   = document.getElementById('newDishName').value;
+  const d   = document.getElementById('newDishDesc').value;
+  const p   = parseFloat(document.getElementById('newDishPrice').value);
+  const img = document.getElementById('newDishImage').value;
   if (n && d && !isNaN(p)) {
-    menu.push({ name: n, desc: d, price: p });
+    menu.push({ name: n, desc: d, price: p, image: img });
     localStorage.setItem('menu', JSON.stringify(menu));
     renderMenu();
+    // limpar o campo de imagem após adicionar
+    document.getElementById('newDishImage').value = '';
   }
 }
 
