@@ -71,8 +71,8 @@ whatsAppBtn.addEventListener('click', () => {
   const encoded = encodeURIComponent(message);
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const url = isMobile
-    ? `https://wa.me/${phone}?text=${encoded}`
-    : `https://web.whatsapp.com/send?phone=${phone}&text=${encoded}`;
+    ? `https://wa.me/${5521997291267}?text=${encoded}`
+    : `https://web.whatsapp.com/send?phone=${5521997291267}&text=${encoded}`;
 
   window.open(url, "_blank");
 });
