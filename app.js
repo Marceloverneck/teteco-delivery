@@ -19,7 +19,10 @@ function renderMenu() {
   menu.forEach((item, i) => {
     const div = document.createElement('div');
     div.className = "bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col items-start space-y-2 mb-6";
-    const srcImg = item.image.trim() !== "" ? item.image : "https://via.placeholder.com/600x400";
+    // Agora verificamos se item.image existe antes de usar trim()
+    const srcImg = (item.image && item.image.trim())
+      ? item.image
+      : "https://via.placeholder.com/600x400";
     div.innerHTML = `
       <img src="${srcImg}" alt="${item.name}" class="w-full h-auto rounded-md mb-2">
       <h3 class="text-xl font-bold text-amber-400">${item.name} – R$ ${item.price.toFixed(2)}</h3>
@@ -58,7 +61,7 @@ whatsAppBtn.addEventListener('click', () => {
 
   let message = `*Novo Pedido*\nCliente: ${customerName}\nData: ${dateStr} ${timeStr}\n\n`;
   cart.forEach(item => message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`);
-  const total = cart.reduce((s,x) => s + x.price, 0).toFixed(2);
+  const total = cart.reduce((s, x) => s + x.price, 0).toFixed(2);
   message += `\nTotal: R$ ${total}`;
 
   const phone = "5521997291267";
@@ -73,7 +76,9 @@ adminLoginBtn.addEventListener('click', () => {
     adminPanel.style.display = "block";
     logoutBtn.style.display = "inline-block";
     renderAdminMenu();
-  } else alert("Senha incorreta!");
+  } else {
+    alert("Senha incorreta!");
+  }
 });
 
 logoutBtn.addEventListener('click', () => {
@@ -95,9 +100,9 @@ function renderAdminMenu() {
 }
 
 function addNewDish() {
-  const n = document.getElementById('newDishName').value;
-  const d = document.getElementById('newDishDesc').value;
-  const p = parseFloat(document.getElementById('newDishPrice').value);
+  const n   = document.getElementById('newDishName').value;
+  const d   = document.getElementById('newDishDesc').value;
+  const p   = parseFloat(document.getElementById('newDishPrice').value);
   const img = document.getElementById('newDishImage').value;
   if (n && d && !isNaN(p)) {
     menu.push({ name: n, desc: d, price: p, image: img });
@@ -120,11 +125,12 @@ function editDish(i) {
 
 function deleteDish(i) {
   if (confirm("Deseja excluir este prato?")) {
-    menu.splice(i,1);
+    menu.splice(i, 1);
     localStorage.setItem('menu', JSON.stringify(menu));
     renderMenu();
   }
 }
 
+// Renderiza tudo ao carregar
 renderMenu();
 renderCart();
