@@ -12,7 +12,7 @@ let menu = JSON.parse(localStorage.getItem('menu')) || [
   { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99, image: "" },
   { name: "Risoto de Camarão",   desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
 ];
-];
+
 let cart    = [];
 
 function renderMenu() {
