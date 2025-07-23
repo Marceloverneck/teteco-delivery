@@ -1,17 +1,18 @@
-const menuContainer = document.getElementById('menuContainer');
+const menuContainer   = document.getElementById('menuContainer');
 const cartContainer   = document.getElementById('cartItems');
 const cartTotal       = document.getElementById('cartTotal');
 const whatsAppBtn     = document.getElementById('whatsAppBtn');
 const adminPanel      = document.getElementById('adminPanel');
 const adminLoginBtn   = document.getElementById('adminLoginBtn');
+const logoutBtn       = document.getElementById('logoutBtn');
 const adminDishList   = document.getElementById('adminDishList');
 
-let isAdmin    = false;
-let menu       = JSON.parse(localStorage.getItem('menu')) || [
+let isAdmin = false;
+let menu    = JSON.parse(localStorage.getItem('menu')) || [
   { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99 },
   { name: "Risoto de Camarão", desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99 }
 ];
-let cart       = [];
+let cart    = [];
 
 function renderMenu() {
   menuContainer.innerHTML = "";
@@ -47,21 +48,32 @@ function addToCart(i) {
 whatsAppBtn.addEventListener('click', () => {
   let msg = "Olá, gostaria de pedir:\n";
   cart.forEach(item => { msg += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`; });
-  msg += `Total: R$ ${cart.reduce((s,x)=>s+x.price,0).toFixed(2)}`;
+  msg += `Total: R$ ${cart.reduce((s, x) => s + x.price, 0).toFixed(2)}`;
   window.open(`https://wa.me/5521997291267?text=${encodeURIComponent(msg)}`, '_blank');
 });
 
 adminLoginBtn.addEventListener('click', () => {
   const pwd = prompt("Digite a senha de administrador:");
-  if (pwd==="admin") {
-    isAdmin=true;
-    adminPanel.style.display="block";
+  if (pwd === "admin") {
+    isAdmin = true;
+    adminPanel.style.display = "block";
+    logoutBtn.style.display  = "inline-block";
     renderAdminMenu();
-  } else alert("Senha incorreta!");
+  } else {
+    alert("Senha incorreta!");
+  }
+});
+
+// Logout: voltar ao modo cliente
+logoutBtn.addEventListener('click', () => {
+  isAdmin = false;
+  adminPanel.style.display = "none";
+  logoutBtn.style.display  = "none";
+  renderMenu();
 });
 
 function renderAdminMenu() {
-  adminDishList.innerHTML="";
+  adminDishList.innerHTML = "";
   menu.forEach((item, i) => {
     const li = document.createElement('li');
     li.innerHTML = `${item.name} - R$ ${item.price.toFixed(2)}
