@@ -19,9 +19,14 @@ function renderMenu() {
   menu.forEach((item, i) => {
     const div = document.createElement('div');
     div.className = "bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col items-start space-y-2 mb-6";
-    const srcImg = item.image && item.image.trim() !== "" ? item.image : "https://via.placeholder.com/600x400";
+    
+    // Usa a imagem do prato ou a imagem padrão se URL for vazia ou inválida
+    const srcImg = item.image && item.image.trim() !== "" 
+                   ? item.image 
+                   : "https://via.placeholder.com/600x400?text=Imagem+Indisponível";
+
     div.innerHTML = `
-      <img src="${srcImg}" alt="${item.name}" class="w-full h-auto rounded-md mb-2">
+      <img src="${srcImg}" alt="${item.name}" class="w-full h-auto rounded-md mb-2" onerror="this.onerror=null;this.src='https://via.placeholder.com/600x400?text=Imagem+Indisponível';" />
       <h3 class="text-xl font-bold text-amber-400">${item.name} – R$ ${item.price.toFixed(2)}</h3>
       <p class="text-gray-300">${item.desc}</p>
       <button onclick="addToCart(${i})" class="mt-2 bg-amber-500 hover:bg-amber-600 text-gray-900 font-semibold py-2 px-4 rounded">
@@ -52,12 +57,8 @@ function addToCart(i) {
 
 whatsAppBtn.addEventListener('click', () => {
   const customerName = prompt("Por favor, digite seu nome:");
-  if(!customerName) {
-    alert("O nome é obrigatório para fazer o pedido.");
-    return;
-  }
-  if(cart.length === 0){
-    alert("Seu carrinho está vazio. Adicione pelo menos um prato.");
+  if (!customerName) {
+    alert("Por favor, insira seu nome para continuar com o pedido.");
     return;
   }
   const now = new Date();
@@ -69,7 +70,20 @@ whatsAppBtn.addEventListener('click', () => {
   const total = cart.reduce((s,x) => s + x.price, 0).toFixed(2);
   message += `\nTotal: R$ ${total}`;
 
-  const phone = "5521997291267"; // Seu número com DDD, sem espaços nem símbolos
+  // Grava no Firebase (se configurado)
+  if (typeof db !== "undefined") {
+    const nowTs = Date.now();
+    db.ref('orders/' + nowTs).set({
+      cliente: customerName,
+      data: dateStr,
+      hora: timeStr,
+      itens: cart.map(it => ({ nome: it.name, preco: it.price })),
+      total: parseFloat(total),
+      timestamp: nowTs
+    });
+  }
+
+  const phone = "5521997291267";
   const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
 });
@@ -81,9 +95,7 @@ adminLoginBtn.addEventListener('click', () => {
     adminPanel.style.display = "block";
     logoutBtn.style.display = "inline-block";
     renderAdminMenu();
-  } else {
-    alert("Senha incorreta!");
-  }
+  } else alert("Senha incorreta!");
 });
 
 logoutBtn.addEventListener('click', () => {
@@ -105,21 +117,20 @@ function renderAdminMenu() {
 }
 
 function addNewDish() {
-  const n = document.getElementById('newDishName').value.trim();
-  const d = document.getElementById('newDishDesc').value.trim();
+  const n = document.getElementById('newDishName').value;
+  const d = document.getElementById('newDishDesc').value;
   const p = parseFloat(document.getElementById('newDishPrice').value);
-  const img = document.getElementById('newDishImage').value.trim();
+  const img = document.getElementById('newDishImage').value;
   if (n && d && !isNaN(p)) {
     menu.push({ name: n, desc: d, price: p, image: img });
     localStorage.setItem('menu', JSON.stringify(menu));
     renderMenu();
-    // limpar campos depois de adicionar
-    document.getElementById('newDishName').value = "";
-    document.getElementById('newDishDesc').value = "";
-    document.getElementById('newDishPrice').value = "";
-    document.getElementById('newDishImage').value = "";
+    document.getElementById('newDishName').value = '';
+    document.getElementById('newDishDesc').value = '';
+    document.getElementById('newDishPrice').value = '';
+    document.getElementById('newDishImage').value = '';
   } else {
-    alert("Preencha todos os campos corretamente para adicionar um prato.");
+    alert("Preencha todos os campos corretamente para adicionar o prato.");
   }
 }
 
