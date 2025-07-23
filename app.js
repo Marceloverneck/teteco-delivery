@@ -17,19 +17,22 @@ let cart    = [];
 
 function renderMenu() {
   menuContainer.innerHTML = "";
-  menu.forEach((item, i) => {
-    const div    = document.createElement('div');
-    const srcImg = item.image && item.image.trim() !== "" 
-                   ? item.image 
-                   : 'https://via.placeholder.com/600x400';
-    div.innerHTML = `
-      <img src="${srcImg}" alt="${item.name}">
-      <h3>${item.name} – R$ ${item.price.toFixed(2)}</h3>
-      <p>${item.desc}</p>
-      <button onclick="addToCart(${i})">Adicionar</button>
-    `;
-    menuContainer.appendChild(div);
-  });
+menu.forEach((item, i) => {
+  const div    = document.createElement('div');
+  div.className = "bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col items-start space-y-2 mb-6";
+  const srcImg = item.image && item.image.trim() !== ""
+                 ? item.image
+                 : 'https://via.placeholder.com/600x400';
+  div.innerHTML = `
+    <img src="${srcImg}" alt="${item.name}" class="w-full h-auto rounded-md mb-2">
+    <h3 class="text-xl font-bold text-amber-400">${item.name} – R$ ${item.price.toFixed(2)}</h3>
+    <p class="text-gray-300">${item.desc}</p>
+    <button onclick="addToCart(${i})" class="mt-2 bg-amber-500 hover:bg-amber-600 text-gray-900 font-semibold py-2 px-4 rounded">
+      Adicionar
+    </button>
+  `;
+  menuContainer.appendChild(div);
+});
   if (isAdmin) renderAdminMenu();
 }
 
@@ -149,5 +152,5 @@ function deleteDish(i) {
   }
 }
 
-renderMenu();
+function renderMenu()
 renderCart();
