@@ -90,7 +90,7 @@ whatsAppBtn.addEventListener('click', () => {
 
 adminLoginBtn.addEventListener('click', () => {
   const pwd = prompt("Digite a senha de administrador:");
-  if (pwd === "admin") {
+  if (pwd === "Marcelo") {
     isAdmin = true;
     adminPanel.style.display = "block";
     logoutBtn.style.display = "inline-block";
