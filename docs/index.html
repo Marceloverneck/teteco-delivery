@@ -14,24 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- CSS local -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Firebase (Compat) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://SEU_PROJECT_ID-default-rtdb.firebaseio.com",
-      projectId: "SEU_PROJECT_ID",
-      storageBucket: "SEU_PROJECT_ID.appspot.com",
-      messagingSenderId: "SEU_SENDER_ID",
-      appId: "SEU_APP_ID"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-  </script>
+  <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body class="bg-gray-900 text-gray-100 font-poppins min-h-screen">
@@ -68,19 +51,16 @@
   <div id="adminPanel" class="container mx-auto p-6 bg-gray-800 rounded-xl space-y-4" style="display:none">
     <h2 class="text-2xl font-semibold">Painel do Administrador</h2>
     <ul id="adminDishList" class="space-y-2"></ul>
-
-    <!-- Campos para adicionar/editar prato -->
     <input id="newDishName"  class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Nome do prato" />
     <input id="newDishDesc"  class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Descrição" />
     <input id="newDishPrice" type="number" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Preço" />
     <input id="newDishImage" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="URL da imagem" />
-
     <button onclick="addNewDish()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
       Adicionar Prato
     </button>
   </div>
 
   <!-- Script principal -->
-  <script src="app.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
