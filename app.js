@@ -67,7 +67,7 @@ whatsAppBtn.addEventListener('click', () => {
   const total = cart.reduce((s, x) => s + x.price, 0).toFixed(2);
   message += `\nTotal: R$ ${total}`;
 
-  const phone = "5521YOURNUMBER";  // <-- substitua pelo seu número completo (ex: 5521999998888)
+  const phone = "5521997291267";  // <-- substitua pelo seu número completo (ex: 5521999998888)
   const encoded = encodeURIComponent(message);
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const url = isMobile
