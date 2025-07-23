@@ -143,3 +143,5 @@ function deleteDish(i) {
 
 renderMenu();
 renderCart();
+renderMenu();
+renderCart();
