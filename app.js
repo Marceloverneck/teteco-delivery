@@ -10,7 +10,7 @@ const adminDishList   = document.getElementById('adminDishList');
 let isAdmin = false;
 let menu = JSON.parse(localStorage.getItem('menu')) || [
   { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99, image: "" },
-  { name: "Risoto de Camarão",  desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
+  { name: "Risoto de Camarão", desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
 ];
 let cart = [];
 
@@ -50,10 +50,6 @@ function addToCart(i) {
   renderCart();
 }
 
-function isMobile() {
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-}
-
 whatsAppBtn.addEventListener('click', () => {
   const customerName = prompt("Por favor, digite seu nome:");
   const now = new Date();
@@ -64,17 +60,6 @@ whatsAppBtn.addEventListener('click', () => {
   cart.forEach(item => message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`);
   const total = cart.reduce((s,x) => s + x.price, 0).toFixed(2);
   message += `\nTotal: R$ ${total}`;
-
-  // Grava no Firebase
-  const nowTs = Date.now();
-  db.ref('orders/' + nowTs).set({
-    cliente: customerName,
-    data: dateStr,
-    hora: timeStr,
-    itens: cart.map(it => ({ nome: it.name, preco: it.price })),
-    total: parseFloat(total),
-    timestamp: nowTs
-  });
 
   const phone = "5521997291267";
   const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
@@ -141,7 +126,5 @@ function deleteDish(i) {
   }
 }
 
-renderMenu();
-renderCart();
 renderMenu();
 renderCart();
