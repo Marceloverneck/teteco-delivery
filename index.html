@@ -5,53 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Teteco Delivery</title>
   <!-- Tailwind CSS via CDN -->
-   <link rel="stylesheet" href="style.css" />
-  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <body class="bg-gray-900 text-gray-100 font-poppins min-h-screen">
+  <!-- Google Fonts: Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
-<script>
-  // Substitua pelos dados do seu projeto Firebase
-  const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SEU_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://SEU_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "SEU_PROJECT_ID",
-    storageBucket: "SEU_PROJECT_ID.appspot.com",
-    messagingSenderId: "SEU_SENDER_ID",
-    appId: "SEU_APP_ID"
-  };
-  // Inicializa o Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-</script>
-
+  <!-- CSS local -->
+  <link rel="stylesheet" href="style.css" />
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
+  <script>
+    // Substitua pelos dados do seu projeto Firebase
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://SEU_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_PROJECT_ID.appspot.com",
+      messagingSenderId: "SEU_SENDER_ID",
+      appId: "SEU_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
 </head>
-</head>
-<body>
-  <h1>Teteco Delivery</h1>
-  <div id="menuContainer"></div>
-  <div id="cart">
-    <h2>Seu Pedido</h2>
-    <ul id="cartItems"></ul>
-    <p>Total: R$ <span id="cartTotal">0,00</span></p>
-    <button id="whatsAppBtn">📞 Aperte e faça seu pedido</button>  </div>
-  <button id="adminLoginBtn">Entrar como administrador</button>
-    <button id="logoutBtn" style="display:none; margin-left:8px;">Sair</button>
-\ <div id="adminPanel" style="display:none;">
-    <h2>Painel do Administrador</h2>
-    <ul id="adminDishList"></ul>
-    <input type="text" id="newDishName" placeholder="Nome do prato" />
-    <input type="text" id="newDishDesc" placeholder="Descrição" />
-    <input type="number" id="newDishPrice" placeholder="Preço" />
-  <input type="text" id="newDishImage" placeholder="URL da imagem" />
-    <button onclick="addNewDish()">Adicionar Prato</button>
-  </div>
+<body class="bg-gray-900 text-gray-100 font-poppins min-h-screen">
+  <header class="p-4 bg-gray-800">
+    <h1 class="text-4xl font-bold text-amber-400">Teteco Delivery</h1>
+  </header>
+  <main class="container mx-auto p-6">
+    <!-- resto do seu corpo aqui -->
+  </main>
   <script src="app.js"></script>
 </body>
 </html>
