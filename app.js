@@ -10,7 +10,7 @@ const adminDishList   = document.getElementById('adminDishList');
 let isAdmin = false;
 let menu = JSON.parse(localStorage.getItem('menu')) || [
   { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99, image: "" },
-  { name: "Risoto de Camarão", desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
+  { name: "Risoto de Camarão",  desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
 ];
 let cart = [];
 
@@ -19,9 +19,9 @@ function renderMenu() {
   menu.forEach((item, i) => {
     const div = document.createElement('div');
     div.className = "bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col items-start space-y-2 mb-6";
-    // Agora verificamos se item.image existe antes de usar trim()
-    const srcImg = (item.image && item.image.trim())
-      ? item.image
+    // Proteção contra image undefined:
+    const srcImg = (item.image && item.image.trim()) 
+      ? item.image 
       : "https://via.placeholder.com/600x400";
     div.innerHTML = `
       <img src="${srcImg}" alt="${item.name}" class="w-full h-auto rounded-md mb-2">
@@ -55,18 +55,30 @@ function addToCart(i) {
 
 whatsAppBtn.addEventListener('click', () => {
   const customerName = prompt("Por favor, digite seu nome:");
+  if (!customerName) {
+    alert("Você precisa informar seu nome para continuar o pedido.");
+    return;
+  }
+
   const now = new Date();
   const dateStr = now.toLocaleDateString("pt-BR");
   const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
   let message = `*Novo Pedido*\nCliente: ${customerName}\nData: ${dateStr} ${timeStr}\n\n`;
-  cart.forEach(item => message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`);
+  cart.forEach(item => {
+    message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`;
+  });
   const total = cart.reduce((s, x) => s + x.price, 0).toFixed(2);
   message += `\nTotal: R$ ${total}`;
 
   const phone = "5521997291267";
   const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
+
+  // Abre em nova aba; se for bloqueado, redireciona na mesma janela
+  const newWindow = window.open(url, '_blank');
+  if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+    window.location.href = url;
+  }
 });
 
 adminLoginBtn.addEventListener('click', () => {
