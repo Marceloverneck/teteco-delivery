@@ -9,8 +9,8 @@ const adminDishList   = document.getElementById('adminDishList');
 
 let isAdmin = false;
 let menu = JSON.parse(localStorage.getItem('menu')) || [
-  { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99, image: "" },
-  { name: "Risoto de Camarão",  desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
+  { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa e maionese.", price: 28.99, image: "" },
+  { name: "Risoto de Camarão", desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
 ];
 let cart = [];
 
@@ -19,9 +19,9 @@ function renderMenu() {
   menu.forEach((item, i) => {
     const div = document.createElement('div');
     div.className = "bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col items-start space-y-2 mb-6";
-    // Proteção contra image undefined:
-    const srcImg = (item.image && item.image.trim()) 
-      ? item.image 
+    // fallback sempre usa o URL inteiro, sem deixar só '600x400'
+    const srcImg = (item.image && item.image.trim())
+      ? item.image
       : "https://via.placeholder.com/600x400";
     div.innerHTML = `
       <img src="${srcImg}" alt="${item.name}" class="w-full h-auto rounded-md mb-2">
@@ -59,7 +59,6 @@ whatsAppBtn.addEventListener('click', () => {
     alert("Você precisa informar seu nome para continuar o pedido.");
     return;
   }
-
   const now = new Date();
   const dateStr = now.toLocaleDateString("pt-BR");
   const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
@@ -72,9 +71,9 @@ whatsAppBtn.addEventListener('click', () => {
   message += `\nTotal: R$ ${total}`;
 
   const phone = "5521997291267";
-  const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
-  // Abre em nova aba; se for bloqueado, redireciona na mesma janela
+  // abre nova aba ou redireciona
   const newWindow = window.open(url, '_blank');
   if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
     window.location.href = url;
@@ -112,10 +111,10 @@ function renderAdminMenu() {
 }
 
 function addNewDish() {
-  const n   = document.getElementById('newDishName').value;
-  const d   = document.getElementById('newDishDesc').value;
-  const p   = parseFloat(document.getElementById('newDishPrice').value);
-  const img = document.getElementById('newDishImage').value;
+  const n = document.getElementById('newDishName').value;
+  const d = document.getElementById('newDishDesc').value;
+  const p = parseFloat(document.getElementById('newDishPrice').value);
+  const img = document.getElementById('newDishImage').value.trim();
   if (n && d && !isNaN(p)) {
     menu.push({ name: n, desc: d, price: p, image: img });
     localStorage.setItem('menu', JSON.stringify(menu));
@@ -143,6 +142,5 @@ function deleteDish(i) {
   }
 }
 
-// Renderiza tudo ao carregar
 renderMenu();
 renderCart();
