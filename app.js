@@ -84,7 +84,7 @@ whatsAppBtn.addEventListener('click', () => {
   }
 
   const phone = "5521997291267";
-  const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+  const url = `https://api.whatsapp.com/send?phone=${5521997291267}&text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
 });
 
@@ -95,9 +95,10 @@ adminLoginBtn.addEventListener('click', () => {
     adminPanel.style.display = "block";
     logoutBtn.style.display = "inline-block";
     renderAdminMenu();
-  } else alert("Senha incorreta!");
+  } else {
+    alert("Senha incorreta!");
+  }
 });
-
 logoutBtn.addEventListener('click', () => {
   isAdmin = false;
   adminPanel.style.display = "none";
