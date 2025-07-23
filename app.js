@@ -10,7 +10,7 @@ const adminDishList   = document.getElementById('adminDishList');
 let isAdmin = false;
 let menu = JSON.parse(localStorage.getItem('menu')) || [
   { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99, image: "" },
-  { name: "Risoto de Camarão", desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
+  { name: "Risoto de Camarão",  desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
 ];
 let cart = [];
 
@@ -19,7 +19,7 @@ function renderMenu() {
   menu.forEach((item, i) => {
     const div = document.createElement('div');
     div.className = "bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col items-start space-y-2 mb-6";
-    const srcImg = item.image && item.image.trim() !== "" ? item.image : "https://via.placeholder.com/600x400";
+    const srcImg = item.image.trim() !== "" ? item.image : "https://via.placeholder.com/600x400";
     div.innerHTML = `
       <img src="${srcImg}" alt="${item.name}" class="w-full h-auto rounded-md mb-2">
       <h3 class="text-xl font-bold text-amber-400">${item.name} – R$ ${item.price.toFixed(2)}</h3>
@@ -51,46 +51,40 @@ function addToCart(i) {
 }
 
 whatsAppBtn.addEventListener('click', () => {
-  const customerName = prompt("Por favor, digite seu nome:");
-  if (!customerName) {
-    alert("Por favor, informe seu nome para continuar.");
+  if (cart.length === 0) {
+    alert("Seu carrinho está vazio! Adicione algum prato antes de fazer o pedido.");
     return;
   }
+  const customerName = prompt("Por favor, digite seu nome:");
+  if (!customerName) {
+    alert("Você precisa digitar seu nome para fazer o pedido.");
+    return;
+  }
+
   const now = new Date();
   const dateStr = now.toLocaleDateString("pt-BR");
   const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
   let message = `*Novo Pedido*\nCliente: ${customerName}\nData: ${dateStr} ${timeStr}\n\n`;
-  cart.forEach(item => message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`);
-  const total = cart.reduce((s, x) => s + x.price, 0).toFixed(2);
+  cart.forEach(item => {
+    message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`;
+  });
+  const total = cart.reduce((sum, item) => sum + item.price, 0).toFixed(2);
   message += `\nTotal: R$ ${total}`;
 
-  // Grava no Firebase
-  const nowTs = Date.now();
-  db.ref('orders/' + nowTs).set({
-    cliente: customerName,
-    data: dateStr,
-    hora: timeStr,
-    itens: cart.map(it => ({ nome: it.name, preco: it.price })),
-    total: parseFloat(total),
-    timestamp: nowTs
-  });
-
-  const phone = "5521997291267"; // Seu número no formato internacional, sem "+"
+  const phone = "5521997291267"; // seu número WhatsApp com DDI, sem espaços
   const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
 });
 
 adminLoginBtn.addEventListener('click', () => {
   const pwd = prompt("Digite a senha de administrador:");
-  if (pwd === "Marcelo") { // coloque sua senha aqui
+  if (pwd === "Marcelo") {  // altere para sua senha desejada
     isAdmin = true;
     adminPanel.style.display = "block";
     logoutBtn.style.display = "inline-block";
     renderAdminMenu();
-  } else {
-    alert("Senha incorreta!");
-  }
+  } else alert("Senha incorreta!");
 });
 
 logoutBtn.addEventListener('click', () => {
@@ -104,29 +98,28 @@ function renderAdminMenu() {
   adminDishList.innerHTML = "";
   menu.forEach((item, i) => {
     const li = document.createElement('li');
-    li.innerHTML = `${item.name} - R$ ${item.price.toFixed(2)}
-      <button onclick="editDish(${i})" class="ml-2 bg-yellow-400 rounded px-2">✏️</button>
-      <button onclick="deleteDish(${i})" class="ml-2 bg-red-500 text-white rounded px-2">🗑️</button>`;
+    li.innerHTML = `${item.name} - R$ ${item.price.toFixed(2)} 
+      <button onclick="editDish(${i})">✏️</button> 
+      <button onclick="deleteDish(${i})">🗑️</button>`;
     adminDishList.appendChild(li);
   });
 }
 
 function addNewDish() {
-  const n = document.getElementById('newDishName').value.trim();
-  const d = document.getElementById('newDishDesc').value.trim();
+  const n = document.getElementById('newDishName').value;
+  const d = document.getElementById('newDishDesc').value;
   const p = parseFloat(document.getElementById('newDishPrice').value);
-  const img = document.getElementById('newDishImage').value.trim();
+  const img = document.getElementById('newDishImage').value;
   if (n && d && !isNaN(p)) {
     menu.push({ name: n, desc: d, price: p, image: img });
     localStorage.setItem('menu', JSON.stringify(menu));
     renderMenu();
-    // limpar campos após adicionar
     document.getElementById('newDishName').value = '';
     document.getElementById('newDishDesc').value = '';
     document.getElementById('newDishPrice').value = '';
     document.getElementById('newDishImage').value = '';
   } else {
-    alert("Preencha todos os campos corretamente.");
+    alert("Por favor, preencha todos os campos corretamente para adicionar um prato.");
   }
 }
 
