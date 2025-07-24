@@ -81,7 +81,7 @@ whatsAppBtn.addEventListener('click', () => {
   });
 
   const phone = "5521997291267";
-  const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+  const url = `https://api.whatsapp.com/send?phone=${5521997291267}&text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
 });
 
