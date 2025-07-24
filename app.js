@@ -36,13 +36,9 @@ function renderMenu() {
 function renderCart() {
   cartContainer.innerHTML = "";
   let total = 0;
-  cart.forEach((item, index) => {
+  cart.forEach(item => {
     const li = document.createElement('li');
-    li.className = "flex justify-between items-center";
-    li.innerHTML = `
-      ${item.name} - R$ ${item.price.toFixed(2)}
-      <button onclick="removeFromCart(${index})" class="ml-4 bg-red-600 hover:bg-red-700 text-white rounded px-2">X</button>
-    `;
+    li.textContent = `${item.name} - R$ ${item.price.toFixed(2)}`;
     cartContainer.appendChild(li);
     total += item.price;
   });
@@ -54,19 +50,14 @@ function addToCart(i) {
   renderCart();
 }
 
-function removeFromCart(index) {
-  cart.splice(index, 1);
-  renderCart();
-}
-
 whatsAppBtn.addEventListener('click', () => {
   if (cart.length === 0) {
-    alert("Seu carrinho está vazio! Por favor, adicione algum prato antes de fazer o pedido.");
+    alert("Seu carrinho está vazio! Adicione algum prato antes de pedir.");
     return;
   }
   const customerName = prompt("Por favor, digite seu nome:");
-  if (!customerName || customerName.trim() === "") {
-    alert("Você precisa digitar seu nome para fazer o pedido.");
+  if (!customerName) {
+    alert("Você precisa informar seu nome para fazer o pedido.");
     return;
   }
 
@@ -78,24 +69,23 @@ whatsAppBtn.addEventListener('click', () => {
   cart.forEach(item => {
     message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`;
   });
-  const total = cart.reduce((sum, item) => sum + item.price, 0).toFixed(2);
+  const total = cart.reduce((s,x) => s + x.price, 0).toFixed(2);
   message += `\nTotal: R$ ${total}`;
 
-  const phone = "5521997291267"; // Seu número do WhatsApp com DDI
+  // Aqui abre o WhatsApp com a mensagem pronta
+  const phone = "5521997291267";  // seu número no formato internacional, sem sinais
   const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
 });
 
 adminLoginBtn.addEventListener('click', () => {
   const pwd = prompt("Digite a senha de administrador:");
-  if (pwd === "Marcelo") { // Coloque aqui sua senha nova
+  if (pwd === "Marcelo") { // coloque aqui sua nova senha
     isAdmin = true;
     adminPanel.style.display = "block";
     logoutBtn.style.display = "inline-block";
     renderAdminMenu();
-  } else {
-    alert("Senha incorreta!");
-  }
+  } else alert("Senha incorreta!");
 });
 
 logoutBtn.addEventListener('click', () => {
@@ -110,17 +100,17 @@ function renderAdminMenu() {
   menu.forEach((item, i) => {
     const li = document.createElement('li');
     li.innerHTML = `${item.name} - R$ ${item.price.toFixed(2)} 
-      <button onclick="editDish(${i})" class="ml-2 px-2 py-1 bg-yellow-500 rounded">✏️</button> 
-      <button onclick="deleteDish(${i})" class="ml-2 px-2 py-1 bg-red-600 rounded">🗑️</button>`;
+      <button onclick="editDish(${i})">✏️</button> 
+      <button onclick="deleteDish(${i})">🗑️</button>`;
     adminDishList.appendChild(li);
   });
 }
 
 function addNewDish() {
-  const n = document.getElementById('newDishName').value.trim();
-  const d = document.getElementById('newDishDesc').value.trim();
+  const n = document.getElementById('newDishName').value;
+  const d = document.getElementById('newDishDesc').value;
   const p = parseFloat(document.getElementById('newDishPrice').value);
-  const img = document.getElementById('newDishImage').value.trim();
+  const img = document.getElementById('newDishImage').value;
   if (n && d && !isNaN(p)) {
     menu.push({ name: n, desc: d, price: p, image: img });
     localStorage.setItem('menu', JSON.stringify(menu));
@@ -153,5 +143,6 @@ function deleteDish(i) {
   }
 }
 
+// Inicializa a tela
 renderMenu();
 renderCart();
