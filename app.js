@@ -36,9 +36,12 @@ function renderMenu() {
 function renderCart() {
   cartContainer.innerHTML = "";
   let total = 0;
-  cart.forEach(item => {
+  cart.forEach((item, index) => {
     const li = document.createElement('li');
-    li.textContent = `${item.name} - R$ ${item.price.toFixed(2)}`;
+    li.innerHTML = `
+      ${item.name} - R$ ${item.price.toFixed(2)}
+      <button onclick="removeFromCart(${index})" style="margin-left:10px; color: red;">🗑️ Remover</button>
+    `;
     cartContainer.appendChild(li);
     total += item.price;
   });
@@ -50,42 +53,48 @@ function addToCart(i) {
   renderCart();
 }
 
-whatsAppBtn.addEventListener('click', () => {
-  if (cart.length === 0) {
-    alert("Seu carrinho está vazio! Adicione algum prato antes de pedir.");
-    return;
-  }
-  const customerName = prompt("Por favor, digite seu nome:");
-  if (!customerName) {
-    alert("Você precisa informar seu nome para fazer o pedido.");
-    return;
-  }
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  renderCart();
+}
 
+whatsAppBtn.addEventListener('click', () => {
+  const customerName = prompt("Por favor, digite seu nome:");
   const now = new Date();
   const dateStr = now.toLocaleDateString("pt-BR");
   const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
   let message = `*Novo Pedido*\nCliente: ${customerName}\nData: ${dateStr} ${timeStr}\n\n`;
-  cart.forEach(item => {
-    message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`;
-  });
+  cart.forEach(item => message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`);
   const total = cart.reduce((s,x) => s + x.price, 0).toFixed(2);
   message += `\nTotal: R$ ${total}`;
 
-  // Aqui abre o WhatsApp com a mensagem pronta
-  const phone = "5521997291267";  // seu número no formato internacional, sem sinais
+  // Grava no Firebase
+  const nowTs = Date.now();
+  db.ref('orders/' + nowTs).set({
+    cliente: customerName,
+    data: dateStr,
+    hora: timeStr,
+    itens: cart.map(it => ({ nome: it.name, preco: it.price })),
+    total: parseFloat(total),
+    timestamp: nowTs
+  });
+
+  const phone = "5521997291267";
   const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
 });
 
 adminLoginBtn.addEventListener('click', () => {
   const pwd = prompt("Digite a senha de administrador:");
-  if (pwd === "Marcelo") { // coloque aqui sua nova senha
+  if (pwd === "Marcelo") {
     isAdmin = true;
     adminPanel.style.display = "block";
     logoutBtn.style.display = "inline-block";
     renderAdminMenu();
-  } else alert("Senha incorreta!");
+  } else {
+    alert("Senha incorreta!");
+  }
 });
 
 logoutBtn.addEventListener('click', () => {
@@ -115,12 +124,7 @@ function addNewDish() {
     menu.push({ name: n, desc: d, price: p, image: img });
     localStorage.setItem('menu', JSON.stringify(menu));
     renderMenu();
-    document.getElementById('newDishName').value = '';
-    document.getElementById('newDishDesc').value = '';
-    document.getElementById('newDishPrice').value = '';
     document.getElementById('newDishImage').value = '';
-  } else {
-    alert("Por favor, preencha todos os campos corretamente.");
   }
 }
 
@@ -143,6 +147,5 @@ function deleteDish(i) {
   }
 }
 
-// Inicializa a tela
 renderMenu();
 renderCart();
