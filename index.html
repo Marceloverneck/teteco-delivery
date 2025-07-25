@@ -1,86 +1,182 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>Teteco Delivery</title>
-
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Fonts: Poppins -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- CSS local -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Firebase (Compat) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://SEU_PROJECT_ID-default-rtdb.firebaseio.com",
-      projectId: "SEU_PROJECT_ID",
-      storageBucket: "SEU_PROJECT_ID.appspot.com",
-      messagingSenderId: "SEU_SENDER_ID",
-      appId: "SEU_APP_ID"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-  </script>
+  <style>
+    body {
+      background: #1a1a1a;
+      color: #ffd600;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin-top: 32px;
+      margin-bottom: 16px;
+      font-size: 2em;
+      text-align: center;
+      font-weight: bold;
+    }
+    .cardapio {
+      width: 96%;
+      max-width: 420px;
+      margin: 0 auto;
+      background: #222;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 4px 16px #0004;
+    }
+    .prato {
+      margin-bottom: 22px;
+      border-bottom: 1px solid #393939;
+      padding-bottom: 10px;
+      position: relative;
+    }
+    .prato:last-child { border-bottom: none; }
+    .nome {
+      font-weight: bold;
+      color: #ffd600;
+      font-size: 1.18em;
+      margin-bottom: 3px;
+    }
+    .descricao {
+      color: #f5f5dc;
+      font-size: 1em;
+      margin-bottom: 3px;
+    }
+    .preco {
+      color: #ffb300;
+      font-weight: bold;
+      font-size: 1.05em;
+    }
+    .promocao {
+      color: #f44141;
+      text-decoration: line-through;
+      margin-left: 6px;
+      font-size: 0.98em;
+      font-weight: normal;
+    }
+    .ocultar-btn {
+      position: absolute;
+      right: 0;
+      top: 0;
+      background: #555;
+      color: #ffd600;
+      border: none;
+      border-radius: 8px;
+      padding: 3px 12px;
+      cursor: pointer;
+      font-size: 0.93em;
+      margin-top: 2px;
+      margin-right: 0px;
+      transition: background 0.2s;
+    }
+    .ocultar-btn:hover {
+      background: #111;
+      color: #fff477;
+    }
+    .rodape {
+      margin-top: 30px;
+      color: #bbb;
+      font-size: 1em;
+      text-align: center;
+    }
+    @media (max-width: 480px) {
+      .cardapio { padding: 8px; }
+      h1 { font-size: 1.3em; }
+      .ocultar-btn { font-size: 0.85em; }
+    }
+  </style>
 </head>
+<body>
+  <h1>Cardápio Teteco Delivery</h1>
+  <div class="cardapio" id="cardapio">
 
-<body class="bg-gray-900 text-gray-100 font-poppins min-h-screen">
-  <header class="p-4 bg-gray-800">
-    <h1 class="text-4xl font-bold text-amber-400">Teteco Delivery</h1>
-  </header>
-
-  <main class="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- Cardápio -->
-    <section id="menuContainer"></section>
-
-    <!-- Carrinho -->
-    <aside class="md:col-span-2 lg:col-span-1 bg-gray-800 p-4 rounded-xl">
-      <h2 class="text-2xl font-semibold mb-4">Seu Pedido</h2>
-      <ul id="cartItems" class="mb-4 space-y-2"></ul>
-      <p class="font-bold text-xl">Total: R$ <span id="cartTotal">0,00</span></p>
-      <button id="whatsAppBtn" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-semibold">
-        📞 Aperte e faça seu pedido
-      </button>
-    </aside>
-  </main>
-
-  <!-- Login/Logout Admin -->
-  <div class="container mx-auto p-6 flex items-center space-x-4">
-    <button id="adminLoginBtn" class="bg-amber-500 hover:bg-amber-600 text-gray-900 py-2 px-4 rounded">
-      Entrar como administrador
-    </button>
-    <button id="logoutBtn" style="display:none" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">
-      Sair
-    </button>
+    <!-- Cada prato tem um botão "Ocultar/Mostrar" só para você -->
+    <div class="prato" data-id="churrasco">
+      <button class="ocultar-btn" onclick="togglePrato('churrasco')">Ocultar</button>
+      <div class="nome">Churrasco Misto</div>
+      <div class="descricao">Contra filé, frango, linguiça, arroz, farofa, maionese e salada.</div>
+      <span class="preco">R$ 27,99</span>
+    </div>
+    <div class="prato" data-id="risoto">
+      <button class="ocultar-btn" onclick="togglePrato('risoto')">Ocultar</button>
+      <div class="nome">Risoto de Camarão</div>
+      <div class="descricao">Camarão, arroz branco, creme de leite.</div>
+      <span class="preco">R$ 28,99</span>
+    </div>
+    <div class="prato" data-id="peixe">
+      <button class="ocultar-btn" onclick="togglePrato('peixe')">Ocultar</button>
+      <div class="nome">Peixe Frito</div>
+      <div class="descricao">Peixe frito, arroz, batata frita ou corada, salada.</div>
+      <span class="preco">R$ 19,99</span>
+    </div>
+    <div class="prato" data-id="frango">
+      <button class="ocultar-btn" onclick="togglePrato('frango')">Ocultar</button>
+      <div class="nome">Frango Frito</div>
+      <div class="descricao">Frango frito, arroz, farofa, batata frita ou corada, salada.</div>
+      <span class="preco">R$ 19,99</span>
+      <span class="promocao">R$ 25,00</span>
+    </div>
+    <div class="prato" data-id="camarao">
+      <button class="ocultar-btn" onclick="togglePrato('camarao')">Ocultar</button>
+      <div class="nome">Camarão</div>
+      <div class="descricao">Camarão empanado ou frito ao alho e óleo, arroz, batatas coradas e salada.</div>
+      <span class="preco">R$ 29,99</span>
+      <span class="promocao">R$ 34,99</span>
+    </div>
+    <div class="prato" data-id="copa">
+      <button class="ocultar-btn" onclick="togglePrato('copa')">Ocultar</button>
+      <div class="nome">Copa Lombo Frito</div>
+      <div class="descricao">Copa lombo, arroz, feijão, batata frita ou corada, salada.</div>
+      <span class="preco">R$ 24,99</span>
+    </div>
+    <div class="prato" data-id="parmegiana">
+      <button class="ocultar-btn" onclick="togglePrato('parmegiana')">Ocultar</button>
+      <div class="nome">Frango a Parmegiana</div>
+      <div class="descricao">Frango a Parmegiana, arroz, feijão, batata frita.</div>
+      <span class="preco">R$ 29,99</span>
+    </div>
+    <div class="prato" data-id="contrafile">
+      <button class="ocultar-btn" onclick="togglePrato('contrafile')">Ocultar</button>
+      <div class="nome">Contra Filé</div>
+      <div class="descricao">Bife frito ou à milanesa, arroz, feijão, batata corada, salada.</div>
+      <span class="preco">R$ 26,99</span>
+    </div>
   </div>
-
-  <!-- Painel do Administrador -->
-  <div id="adminPanel" class="container mx-auto p-6 bg-gray-800 rounded-xl space-y-4" style="display:none">
-    <h2 class="text-2xl font-semibold">Painel do Administrador</h2>
-    <ul id="adminDishList" class="space-y-2"></ul>
-
-    <!-- Campos para adicionar/editar prato -->
-    <input id="newDishName"  class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Nome do prato" />
-    <input id="newDishDesc"  class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Descrição" />
-    <input id="newDishPrice" type="number" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Preço" />
-    <input id="newDishImage" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="URL da imagem" />
-
-    <button onclick="addNewDish()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
-      Adicionar Prato
-    </button>
+  <div class="rodape">
+    Faça seu pedido pelo WhatsApp: <br>
+    <a href="https://wa.me/5521972291267" style="color:#25d366;font-weight:bold;">Clique aqui</a>
   </div>
-
-  <!-- Script principal -->
-  <script src="app.js"></script>
+  <script>
+    // Guarda visibilidade dos pratos no navegador
+    function togglePrato(id) {
+      const prato = document.querySelector(`[data-id="${id}"]`);
+      const ocultos = JSON.parse(localStorage.getItem('ocultos-teteco') || '{}');
+      if (prato.style.display === 'none') {
+        prato.style.display = '';
+        ocultos[id] = false;
+      } else {
+        prato.style.display = 'none';
+        ocultos[id] = true;
+      }
+      localStorage.setItem('ocultos-teteco', JSON.stringify(ocultos));
+    }
+    // Aplica visibilidade ao carregar
+    window.onload = function() {
+      const ocultos = JSON.parse(localStorage.getItem('ocultos-teteco') || '{}');
+      document.querySelectorAll('.prato').forEach(function(prato) {
+        const id = prato.getAttribute('data-id');
+        if (ocultos[id]) {
+          prato.style.display = 'none';
+        }
+      });
+    }
+  </script>
 </body>
 </html>
