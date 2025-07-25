@@ -17,7 +17,7 @@ let cart = [];
 function renderMenu() {
   menuContainer.innerHTML = "";
   menu.forEach((item, i) => {
-    if (item.hidden) return; // não mostra pratos ocultos
+    if(item.hidden) return; // Prato oculto, não mostra para cliente
     const div = document.createElement('div');
     div.className = "bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col items-start space-y-2 mb-6";
     const srcImg = item.image.trim() !== "" ? item.image : "https://via.placeholder.com/600x400";
@@ -89,7 +89,7 @@ whatsAppBtn.addEventListener('click', () => {
 
 adminLoginBtn.addEventListener('click', () => {
   const pwd = prompt("Digite a senha de administrador:");
-  if (pwd === "Marcelo") { // Coloque aqui sua senha nova
+  if (pwd === "Marcelo") { // Sua senha aqui
     isAdmin = true;
     adminPanel.style.display = "block";
     logoutBtn.style.display = "inline-block";
@@ -114,8 +114,8 @@ function renderAdminMenu() {
       ${item.name} - R$ ${item.price.toFixed(2)} 
       <button onclick="editDish(${i})" class="ml-2 px-2 py-1 bg-yellow-500 rounded">✏️</button> 
       <button onclick="deleteDish(${i})" class="ml-2 px-2 py-1 bg-red-600 rounded">🗑️</button>
-      <button onclick="toggleHidden(${i})" class="ml-2 px-2 py-1 bg-gray-600 rounded">
-        ${item.hidden ? 'Mostrar' : 'Ocultar'}
+      <button onclick="toggleHidden(${i})" class="ml-2 px-2 py-1 bg-blue-600 rounded">
+        ${item.hidden ? "Mostrar" : "Ocultar"}
       </button>
     `;
     adminDishList.appendChild(li);
