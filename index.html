@@ -15,10 +15,29 @@
 
   <!-- CSS local -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Firebase (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    // Substitua pelos dados do seu projeto Firebase
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://SEU_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_PROJECT_ID.appspot.com",
+      messagingSenderId: "SEU_SENDER_ID",
+      appId: "SEU_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
 </head>
+
 <body class="bg-gray-900 text-gray-100 font-poppins min-h-screen">
   <header class="p-4 bg-gray-800">
-    <h1 class="text-4xl font-bold text-amber-400">Teteco Delivery</h1>
+    <h1 class="text-4xl font-bold text-amber-400">Teteco e Marcelle Delivery</h1>
   </header>
 
   <main class="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -30,7 +49,10 @@
       <h2 class="text-2xl font-semibold mb-4">Seu Pedido</h2>
       <ul id="cartItems" class="mb-4 space-y-2"></ul>
       <p class="font-bold text-xl">Total: R$ <span id="cartTotal">0,00</span></p>
-      <button id="whatsAppBtn" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-semibold">
+      <button
+        id="whatsAppBtn"
+        class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-semibold"
+      >
         📞 Aperte e faça seu pedido
       </button>
     </aside>
@@ -38,21 +60,61 @@
 
   <!-- Login/Logout Admin -->
   <div class="container mx-auto p-6 flex items-center space-x-4">
-    <button id="adminLoginBtn" class="bg-amber-500 hover:bg-amber-600 text-gray-900 py-2 px-4 rounded">Entrar como administrador</button>
-    <button id="logoutBtn" style="display:none" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Sair</button>
+    <button
+      id="adminLoginBtn"
+      class="bg-amber-500 hover:bg-amber-600 text-gray-900 py-2 px-4 rounded"
+    >
+      Entrar como administrador
+    </button>
+    <button
+      id="logoutBtn"
+      style="display:none"
+      class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+    >
+      Sair
+    </button>
   </div>
 
   <!-- Painel do Administrador -->
-  <div id="adminPanel" class="container mx-auto p-6 bg-gray-800 rounded-xl space-y-4" style="display:none">
+  <div
+    id="adminPanel"
+    class="container mx-auto p-6 bg-gray-800 rounded-xl space-y-4"
+    style="display:none"
+  >
     <h2 class="text-2xl font-semibold">Painel do Administrador</h2>
     <ul id="adminDishList" class="space-y-2"></ul>
-    <input id="newDishName" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Nome do prato" />
-    <input id="newDishDesc" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Descrição" />
-    <input id="newDishPrice" type="number" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Preço" />
-    <input id="newDishImage" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="URL da imagem" />
-    <button onclick="addNewDish()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Adicionar Prato</button>
+
+    <!-- Campos para adicionar/editar prato -->
+    <input
+      id="newDishName"
+      class="block w-full p-2 rounded bg-gray-700 text-gray-100"
+      placeholder="Nome do prato"
+    />
+    <input
+      id="newDishDesc"
+      class="block w-full p-2 rounded bg-gray-700 text-gray-100"
+      placeholder="Descrição"
+    />
+    <input
+      id="newDishPrice"
+      type="number"
+      class="block w-full p-2 rounded bg-gray-700 text-gray-100"
+      placeholder="Preço"
+    />
+    <input
+      id="newDishImage"
+      class="block w-full p-2 rounded bg-gray-700 text-gray-100"
+      placeholder="URL da imagem"
+    />
+    <button
+      onclick="addNewDish()"
+      class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+    >
+      Adicionar Prato
+    </button>
   </div>
 
+  <!-- Script principal -->
   <script src="app.js"></script>
 </body>
 </html>
