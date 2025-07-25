@@ -1,227 +1,58 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Teteco Delivery</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.3/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    body { background: #18181b;}
-    .admin-only { background: #222; color: #fff; border-radius: 8px; padding: 10px; margin-top: 24px; }
-    .input-admin { margin: 2px 0 10px 0; padding: 6px; border-radius: 4px; border: none; width: 100%; }
-    .admin-btns button { margin-left: 5px;}
-  </style>
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- CSS local -->
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="text-amber-400">
-  <div class="max-w-lg mx-auto mt-5 px-3">
-    <h1 class="text-3xl font-bold mb-3 text-center">Teteco Delivery</h1>
-    <div id="menuContainer"></div>
+<body class="bg-gray-900 text-gray-100 font-poppins min-h-screen">
+  <header class="p-4 bg-gray-800">
+    <h1 class="text-4xl font-bold text-amber-400">Teteco Delivery</h1>
+  </header>
 
-    <div class="bg-gray-900 rounded-xl mt-8 p-4">
-      <h2 class="text-xl font-bold mb-2 text-amber-400">Seu Carrinho</h2>
-      <ul id="cartItems"></ul>
-      <div class="font-bold mt-2 text-lg">Total: R$ <span id="cartTotal">0,00</span></div>
-      <button id="whatsAppBtn" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded shadow">Enviar Pedido no WhatsApp</button>
-    </div>
+  <main class="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Cardápio -->
+    <section id="menuContainer"></section>
 
-    <div class="flex justify-between items-center mt-8">
-      <button id="adminLoginBtn" class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-semibold py-2 px-4 rounded">Painel do Admin</button>
-      <button id="logoutBtn" style="display:none" class="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded">Sair Admin</button>
-    </div>
+    <!-- Carrinho -->
+    <aside class="md:col-span-2 lg:col-span-1 bg-gray-800 p-4 rounded-xl">
+      <h2 class="text-2xl font-semibold mb-4">Seu Pedido</h2>
+      <ul id="cartItems" class="mb-4 space-y-2"></ul>
+      <p class="font-bold text-xl">Total: R$ <span id="cartTotal">0,00</span></p>
+      <button id="whatsAppBtn" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-semibold">
+        📞 Aperte e faça seu pedido
+      </button>
+    </aside>
+  </main>
 
-    <div id="adminPanel" style="display:none" class="admin-only mt-4">
-      <h3 class="font-bold mb-2">Editar Cardápio</h3>
-      <input id="newDishName" placeholder="Nome do prato" class="input-admin">
-      <input id="newDishDesc" placeholder="Descrição" class="input-admin">
-      <input id="newDishPrice" placeholder="Preço" type="number" min="0" step="0.01" class="input-admin">
-      <input id="newDishImage" placeholder="URL da imagem (opcional)" class="input-admin">
-      <button onclick="addNewDish()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 rounded">Adicionar prato</button>
-      <h4 class="mt-4 mb-1 font-bold">Pratos:</h4>
-      <ul id="adminDishList" class="admin-btns"></ul>
-    </div>
-
-    <footer class="mt-8 text-center text-gray-400 text-sm">
-      Teteco Delivery &copy; 2025
-    </footer>
+  <!-- Login/Logout Admin -->
+  <div class="container mx-auto p-6 flex items-center space-x-4">
+    <button id="adminLoginBtn" class="bg-amber-500 hover:bg-amber-600 text-gray-900 py-2 px-4 rounded">Entrar como administrador</button>
+    <button id="logoutBtn" style="display:none" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Sair</button>
   </div>
 
-  <script>
-    // Firebase Config (use suas credenciais reais do Firebase se quiser salvar os pedidos online!)
-    var firebaseConfig = {
-      apiKey: "AIzaSyDhNE-KZkT-EXEMPLO-CHAVE-UNICA",
-      authDomain: "teteco-delivery.firebaseapp.com",
-      databaseURL: "https://teteco-delivery-default-rtdb.firebaseio.com/",
-      projectId: "teteco-delivery",
-      storageBucket: "teteco-delivery.appspot.com",
-      messagingSenderId: "100000000000",
-      appId: "1:100000000000:web:exampleid12345"
-    };
-    if (window.firebase) {
-      firebase.initializeApp(firebaseConfig);
-      var db = firebase.database();
-    } else {
-      var db = { ref: ()=>({ set:()=>{} }) }; // Fake se offline
-    }
+  <!-- Painel do Administrador -->
+  <div id="adminPanel" class="container mx-auto p-6 bg-gray-800 rounded-xl space-y-4" style="display:none">
+    <h2 class="text-2xl font-semibold">Painel do Administrador</h2>
+    <ul id="adminDishList" class="space-y-2"></ul>
+    <input id="newDishName" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Nome do prato" />
+    <input id="newDishDesc" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Descrição" />
+    <input id="newDishPrice" type="number" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="Preço" />
+    <input id="newDishImage" class="block w-full p-2 rounded bg-gray-700 text-gray-100" placeholder="URL da imagem" />
+    <button onclick="addNewDish()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">Adicionar Prato</button>
+  </div>
 
-    const menuContainer   = document.getElementById('menuContainer');
-    const cartContainer   = document.getElementById('cartItems');
-    const cartTotal       = document.getElementById('cartTotal');
-    const whatsAppBtn     = document.getElementById('whatsAppBtn');
-    const adminPanel      = document.getElementById('adminPanel');
-    const adminLoginBtn   = document.getElementById('adminLoginBtn');
-    const logoutBtn       = document.getElementById('logoutBtn');
-    const adminDishList   = document.getElementById('adminDishList');
-
-    let isAdmin = false;
-    let menu = JSON.parse(localStorage.getItem('menu')) || [
-      { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99, image: "" },
-      { name: "Risoto de Camarão",  desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
-    ];
-    let cart = [];
-
-    function renderMenu() {
-      menuContainer.innerHTML = "";
-      menu.forEach((item, i) => {
-        const div = document.createElement('div');
-        div.className = "bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col items-start space-y-2 mb-6";
-        const srcImg = item.image.trim() !== "" ? item.image : "https://via.placeholder.com/600x400";
-        div.innerHTML = `
-          <img src="${srcImg}" alt="${item.name}" class="w-full h-auto rounded-md mb-2">
-          <h3 class="text-xl font-bold text-amber-400">${item.name} – R$ ${item.price.toFixed(2)}</h3>
-          <p class="text-gray-300">${item.desc}</p>
-          <button onclick="addToCart(${i})" class="mt-2 bg-amber-500 hover:bg-amber-600 text-gray-900 font-semibold py-2 px-4 rounded">
-            Adicionar
-          </button>
-        `;
-        menuContainer.appendChild(div);
-      });
-      if (isAdmin) renderAdminMenu();
-    }
-
-    function renderCart() {
-      cartContainer.innerHTML = "";
-      let total = 0;
-      cart.forEach((item, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          ${item.name} - R$ ${item.price.toFixed(2)}
-          <button onclick="removeFromCart(${index})" style="margin-left:10px; color: red;">🗑️ Remover</button>
-        `;
-        cartContainer.appendChild(li);
-        total += item.price;
-      });
-      cartTotal.textContent = total.toFixed(2).replace('.', ',');
-    }
-
-    function addToCart(i) {
-      cart.push(menu[i]);
-      renderCart();
-    }
-
-    function removeFromCart(index) {
-      cart.splice(index, 1);
-      renderCart();
-    }
-
-    whatsAppBtn.addEventListener('click', () => {
-      const customerName = prompt("Por favor, digite seu nome:");
-      const now = new Date();
-      const dateStr = now.toLocaleDateString("pt-BR");
-      const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-
-      let message = `*Novo Pedido*\nCliente: ${customerName}\nData: ${dateStr} ${timeStr}\n\n`;
-      cart.forEach(item => message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`);
-      const total = cart.reduce((s,x) => s + x.price, 0).toFixed(2);
-      message += `\nTotal: R$ ${total}`;
-
-      // Grava no Firebase
-      const nowTs = Date.now();
-      if (db && db.ref) {
-        db.ref('orders/' + nowTs).set({
-          cliente: customerName,
-          data: dateStr,
-          hora: timeStr,
-          itens: cart.map(it => ({ nome: it.name, preco: it.price })),
-          total: parseFloat(total),
-          timestamp: nowTs
-        });
-      }
-
-      const phone = "5521997291267";
-      const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-    });
-
-    adminLoginBtn.addEventListener('click', () => {
-      const pwd = prompt("Digite a senha de administrador:");
-      if (pwd === "Marcelo") {
-        isAdmin = true;
-        adminPanel.style.display = "block";
-        logoutBtn.style.display = "inline-block";
-        renderAdminMenu();
-      } else {
-        alert("Senha incorreta!");
-      }
-    });
-
-    logoutBtn.addEventListener('click', () => {
-      isAdmin = false;
-      adminPanel.style.display = "none";
-      logoutBtn.style.display = "none";
-      renderMenu();
-    });
-
-    function renderAdminMenu() {
-      adminDishList.innerHTML = "";
-      menu.forEach((item, i) => {
-        const li = document.createElement('li');
-        li.innerHTML = `${item.name} - R$ ${item.price.toFixed(2)} 
-          <button onclick="editDish(${i})">✏️</button> 
-          <button onclick="deleteDish(${i})">🗑️</button>`;
-        adminDishList.appendChild(li);
-      });
-    }
-
-    window.addNewDish = function addNewDish() {
-      const n = document.getElementById('newDishName').value;
-      const d = document.getElementById('newDishDesc').value;
-      const p = parseFloat(document.getElementById('newDishPrice').value);
-      const img = document.getElementById('newDishImage').value;
-      if (n && d && !isNaN(p)) {
-        menu.push({ name: n, desc: d, price: p, image: img });
-        localStorage.setItem('menu', JSON.stringify(menu));
-        renderMenu();
-        document.getElementById('newDishName').value = '';
-        document.getElementById('newDishDesc').value = '';
-        document.getElementById('newDishPrice').value = '';
-        document.getElementById('newDishImage').value = '';
-      }
-    }
-
-    window.editDish = function editDish(i) {
-      const n = prompt("Novo nome:", menu[i].name);
-      const d = prompt("Nova descrição:", menu[i].desc);
-      const p = prompt("Novo preço:", menu[i].price);
-      if (n && d && p) {
-        menu[i] = { name: n, desc: d, price: parseFloat(p), image: menu[i].image };
-        localStorage.setItem('menu', JSON.stringify(menu));
-        renderMenu();
-      }
-    }
-
-    window.deleteDish = function deleteDish(i) {
-      if (confirm("Deseja excluir este prato?")) {
-        menu.splice(i,1);
-        localStorage.setItem('menu', JSON.stringify(menu));
-        renderMenu();
-      }
-    }
-
-    renderMenu();
-    renderCart();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
