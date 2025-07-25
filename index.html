@@ -3,180 +3,225 @@
 <head>
   <meta charset="UTF-8">
   <title>Teteco Delivery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.3/dist/tailwind.min.css" rel="stylesheet">
   <style>
-    body {
-      background: #1a1a1a;
-      color: #ffd600;
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      min-height: 100vh;
-      padding: 20px 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    h1 {
-      margin-top: 32px;
-      margin-bottom: 16px;
-      font-size: 2em;
-      text-align: center;
-      font-weight: bold;
-    }
-    .cardapio {
-      width: 96%;
-      max-width: 420px;
-      margin: 0 auto;
-      background: #222;
-      border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 4px 16px #0004;
-    }
-    .prato {
-      margin-bottom: 22px;
-      border-bottom: 1px solid #393939;
-      padding-bottom: 10px;
-      position: relative;
-    }
-    .prato:last-child { border-bottom: none; }
-    .nome {
-      font-weight: bold;
-      color: #ffd600;
-      font-size: 1.18em;
-      margin-bottom: 3px;
-    }
-    .descricao {
-      color: #f5f5dc;
-      font-size: 1em;
-      margin-bottom: 3px;
-    }
-    .preco {
-      color: #ffb300;
-      font-weight: bold;
-      font-size: 1.05em;
-    }
-    .promocao {
-      color: #f44141;
-      text-decoration: line-through;
-      margin-left: 6px;
-      font-size: 0.98em;
-      font-weight: normal;
-    }
-    .ocultar-btn {
-      position: absolute;
-      right: 0;
-      top: 0;
-      background: #555;
-      color: #ffd600;
-      border: none;
-      border-radius: 8px;
-      padding: 3px 12px;
-      cursor: pointer;
-      font-size: 0.93em;
-      margin-top: 2px;
-      margin-right: 0px;
-      transition: background 0.2s;
-    }
-    .ocultar-btn:hover {
-      background: #111;
-      color: #fff477;
-    }
-    .rodape {
-      margin-top: 30px;
-      color: #bbb;
-      font-size: 1em;
-      text-align: center;
-    }
-    @media (max-width: 480px) {
-      .cardapio { padding: 8px; }
-      h1 { font-size: 1.3em; }
-      .ocultar-btn { font-size: 0.85em; }
-    }
+    body { background: #18181b;}
+    .admin-only { background: #222; color: #fff; border-radius: 8px; padding: 10px; margin-top: 24px; }
+    .input-admin { margin: 2px 0 10px 0; padding: 6px; border-radius: 4px; border: none; width: 100%; }
+    .admin-btns button { margin-left: 5px;}
   </style>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
-<body>
-  <h1>Cardápio Teteco Delivery</h1>
-  <div class="cardapio" id="cardapio">
+<body class="text-amber-400">
+  <div class="max-w-lg mx-auto mt-5 px-3">
+    <h1 class="text-3xl font-bold mb-3 text-center">Teteco Delivery</h1>
+    <div id="menuContainer"></div>
 
-    <!-- Cada prato tem um botão "Ocultar/Mostrar" só para você -->
-    <div class="prato" data-id="churrasco">
-      <button class="ocultar-btn" onclick="togglePrato('churrasco')">Ocultar</button>
-      <div class="nome">Churrasco Misto</div>
-      <div class="descricao">Contra filé, frango, linguiça, arroz, farofa, maionese e salada.</div>
-      <span class="preco">R$ 27,99</span>
+    <div class="bg-gray-900 rounded-xl mt-8 p-4">
+      <h2 class="text-xl font-bold mb-2 text-amber-400">Seu Carrinho</h2>
+      <ul id="cartItems"></ul>
+      <div class="font-bold mt-2 text-lg">Total: R$ <span id="cartTotal">0,00</span></div>
+      <button id="whatsAppBtn" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded shadow">Enviar Pedido no WhatsApp</button>
     </div>
-    <div class="prato" data-id="risoto">
-      <button class="ocultar-btn" onclick="togglePrato('risoto')">Ocultar</button>
-      <div class="nome">Risoto de Camarão</div>
-      <div class="descricao">Camarão, arroz branco, creme de leite.</div>
-      <span class="preco">R$ 28,99</span>
+
+    <div class="flex justify-between items-center mt-8">
+      <button id="adminLoginBtn" class="bg-amber-500 hover:bg-amber-600 text-gray-900 font-semibold py-2 px-4 rounded">Painel do Admin</button>
+      <button id="logoutBtn" style="display:none" class="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded">Sair Admin</button>
     </div>
-    <div class="prato" data-id="peixe">
-      <button class="ocultar-btn" onclick="togglePrato('peixe')">Ocultar</button>
-      <div class="nome">Peixe Frito</div>
-      <div class="descricao">Peixe frito, arroz, batata frita ou corada, salada.</div>
-      <span class="preco">R$ 19,99</span>
+
+    <div id="adminPanel" style="display:none" class="admin-only mt-4">
+      <h3 class="font-bold mb-2">Editar Cardápio</h3>
+      <input id="newDishName" placeholder="Nome do prato" class="input-admin">
+      <input id="newDishDesc" placeholder="Descrição" class="input-admin">
+      <input id="newDishPrice" placeholder="Preço" type="number" min="0" step="0.01" class="input-admin">
+      <input id="newDishImage" placeholder="URL da imagem (opcional)" class="input-admin">
+      <button onclick="addNewDish()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 rounded">Adicionar prato</button>
+      <h4 class="mt-4 mb-1 font-bold">Pratos:</h4>
+      <ul id="adminDishList" class="admin-btns"></ul>
     </div>
-    <div class="prato" data-id="frango">
-      <button class="ocultar-btn" onclick="togglePrato('frango')">Ocultar</button>
-      <div class="nome">Frango Frito</div>
-      <div class="descricao">Frango frito, arroz, farofa, batata frita ou corada, salada.</div>
-      <span class="preco">R$ 19,99</span>
-      <span class="promocao">R$ 25,00</span>
-    </div>
-    <div class="prato" data-id="camarao">
-      <button class="ocultar-btn" onclick="togglePrato('camarao')">Ocultar</button>
-      <div class="nome">Camarão</div>
-      <div class="descricao">Camarão empanado ou frito ao alho e óleo, arroz, batatas coradas e salada.</div>
-      <span class="preco">R$ 29,99</span>
-      <span class="promocao">R$ 34,99</span>
-    </div>
-    <div class="prato" data-id="copa">
-      <button class="ocultar-btn" onclick="togglePrato('copa')">Ocultar</button>
-      <div class="nome">Copa Lombo Frito</div>
-      <div class="descricao">Copa lombo, arroz, feijão, batata frita ou corada, salada.</div>
-      <span class="preco">R$ 24,99</span>
-    </div>
-    <div class="prato" data-id="parmegiana">
-      <button class="ocultar-btn" onclick="togglePrato('parmegiana')">Ocultar</button>
-      <div class="nome">Frango a Parmegiana</div>
-      <div class="descricao">Frango a Parmegiana, arroz, feijão, batata frita.</div>
-      <span class="preco">R$ 29,99</span>
-    </div>
-    <div class="prato" data-id="contrafile">
-      <button class="ocultar-btn" onclick="togglePrato('contrafile')">Ocultar</button>
-      <div class="nome">Contra Filé</div>
-      <div class="descricao">Bife frito ou à milanesa, arroz, feijão, batata corada, salada.</div>
-      <span class="preco">R$ 26,99</span>
-    </div>
+
+    <footer class="mt-8 text-center text-gray-400 text-sm">
+      Teteco Delivery &copy; 2025
+    </footer>
   </div>
-  <div class="rodape">
-    Faça seu pedido pelo WhatsApp: <br>
-    <a href="https://wa.me/5521972291267" style="color:#25d366;font-weight:bold;">Clique aqui</a>
-  </div>
+
   <script>
-    // Guarda visibilidade dos pratos no navegador
-    function togglePrato(id) {
-      const prato = document.querySelector(`[data-id="${id}"]`);
-      const ocultos = JSON.parse(localStorage.getItem('ocultos-teteco') || '{}');
-      if (prato.style.display === 'none') {
-        prato.style.display = '';
-        ocultos[id] = false;
-      } else {
-        prato.style.display = 'none';
-        ocultos[id] = true;
-      }
-      localStorage.setItem('ocultos-teteco', JSON.stringify(ocultos));
+    // Firebase Config (use suas credenciais reais do Firebase se quiser salvar os pedidos online!)
+    var firebaseConfig = {
+      apiKey: "AIzaSyDhNE-KZkT-EXEMPLO-CHAVE-UNICA",
+      authDomain: "teteco-delivery.firebaseapp.com",
+      databaseURL: "https://teteco-delivery-default-rtdb.firebaseio.com/",
+      projectId: "teteco-delivery",
+      storageBucket: "teteco-delivery.appspot.com",
+      messagingSenderId: "100000000000",
+      appId: "1:100000000000:web:exampleid12345"
+    };
+    if (window.firebase) {
+      firebase.initializeApp(firebaseConfig);
+      var db = firebase.database();
+    } else {
+      var db = { ref: ()=>({ set:()=>{} }) }; // Fake se offline
     }
-    // Aplica visibilidade ao carregar
-    window.onload = function() {
-      const ocultos = JSON.parse(localStorage.getItem('ocultos-teteco') || '{}');
-      document.querySelectorAll('.prato').forEach(function(prato) {
-        const id = prato.getAttribute('data-id');
-        if (ocultos[id]) {
-          prato.style.display = 'none';
-        }
+
+    const menuContainer   = document.getElementById('menuContainer');
+    const cartContainer   = document.getElementById('cartItems');
+    const cartTotal       = document.getElementById('cartTotal');
+    const whatsAppBtn     = document.getElementById('whatsAppBtn');
+    const adminPanel      = document.getElementById('adminPanel');
+    const adminLoginBtn   = document.getElementById('adminLoginBtn');
+    const logoutBtn       = document.getElementById('logoutBtn');
+    const adminDishList   = document.getElementById('adminDishList');
+
+    let isAdmin = false;
+    let menu = JSON.parse(localStorage.getItem('menu')) || [
+      { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99, image: "" },
+      { name: "Risoto de Camarão",  desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "" }
+    ];
+    let cart = [];
+
+    function renderMenu() {
+      menuContainer.innerHTML = "";
+      menu.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = "bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col items-start space-y-2 mb-6";
+        const srcImg = item.image.trim() !== "" ? item.image : "https://via.placeholder.com/600x400";
+        div.innerHTML = `
+          <img src="${srcImg}" alt="${item.name}" class="w-full h-auto rounded-md mb-2">
+          <h3 class="text-xl font-bold text-amber-400">${item.name} – R$ ${item.price.toFixed(2)}</h3>
+          <p class="text-gray-300">${item.desc}</p>
+          <button onclick="addToCart(${i})" class="mt-2 bg-amber-500 hover:bg-amber-600 text-gray-900 font-semibold py-2 px-4 rounded">
+            Adicionar
+          </button>
+        `;
+        menuContainer.appendChild(div);
+      });
+      if (isAdmin) renderAdminMenu();
+    }
+
+    function renderCart() {
+      cartContainer.innerHTML = "";
+      let total = 0;
+      cart.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          ${item.name} - R$ ${item.price.toFixed(2)}
+          <button onclick="removeFromCart(${index})" style="margin-left:10px; color: red;">🗑️ Remover</button>
+        `;
+        cartContainer.appendChild(li);
+        total += item.price;
+      });
+      cartTotal.textContent = total.toFixed(2).replace('.', ',');
+    }
+
+    function addToCart(i) {
+      cart.push(menu[i]);
+      renderCart();
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    whatsAppBtn.addEventListener('click', () => {
+      const customerName = prompt("Por favor, digite seu nome:");
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("pt-BR");
+      const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+      let message = `*Novo Pedido*\nCliente: ${customerName}\nData: ${dateStr} ${timeStr}\n\n`;
+      cart.forEach(item => message += `- ${item.name} - R$ ${item.price.toFixed(2)}\n`);
+      const total = cart.reduce((s,x) => s + x.price, 0).toFixed(2);
+      message += `\nTotal: R$ ${total}`;
+
+      // Grava no Firebase
+      const nowTs = Date.now();
+      if (db && db.ref) {
+        db.ref('orders/' + nowTs).set({
+          cliente: customerName,
+          data: dateStr,
+          hora: timeStr,
+          itens: cart.map(it => ({ nome: it.name, preco: it.price })),
+          total: parseFloat(total),
+          timestamp: nowTs
+        });
+      }
+
+      const phone = "5521997291267";
+      const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+    });
+
+    adminLoginBtn.addEventListener('click', () => {
+      const pwd = prompt("Digite a senha de administrador:");
+      if (pwd === "Marcelo") {
+        isAdmin = true;
+        adminPanel.style.display = "block";
+        logoutBtn.style.display = "inline-block";
+        renderAdminMenu();
+      } else {
+        alert("Senha incorreta!");
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      isAdmin = false;
+      adminPanel.style.display = "none";
+      logoutBtn.style.display = "none";
+      renderMenu();
+    });
+
+    function renderAdminMenu() {
+      adminDishList.innerHTML = "";
+      menu.forEach((item, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${item.name} - R$ ${item.price.toFixed(2)} 
+          <button onclick="editDish(${i})">✏️</button> 
+          <button onclick="deleteDish(${i})">🗑️</button>`;
+        adminDishList.appendChild(li);
       });
     }
+
+    window.addNewDish = function addNewDish() {
+      const n = document.getElementById('newDishName').value;
+      const d = document.getElementById('newDishDesc').value;
+      const p = parseFloat(document.getElementById('newDishPrice').value);
+      const img = document.getElementById('newDishImage').value;
+      if (n && d && !isNaN(p)) {
+        menu.push({ name: n, desc: d, price: p, image: img });
+        localStorage.setItem('menu', JSON.stringify(menu));
+        renderMenu();
+        document.getElementById('newDishName').value = '';
+        document.getElementById('newDishDesc').value = '';
+        document.getElementById('newDishPrice').value = '';
+        document.getElementById('newDishImage').value = '';
+      }
+    }
+
+    window.editDish = function editDish(i) {
+      const n = prompt("Novo nome:", menu[i].name);
+      const d = prompt("Nova descrição:", menu[i].desc);
+      const p = prompt("Novo preço:", menu[i].price);
+      if (n && d && p) {
+        menu[i] = { name: n, desc: d, price: parseFloat(p), image: menu[i].image };
+        localStorage.setItem('menu', JSON.stringify(menu));
+        renderMenu();
+      }
+    }
+
+    window.deleteDish = function deleteDish(i) {
+      if (confirm("Deseja excluir este prato?")) {
+        menu.splice(i,1);
+        localStorage.setItem('menu', JSON.stringify(menu));
+        renderMenu();
+      }
+    }
+
+    renderMenu();
+    renderCart();
   </script>
 </body>
 </html>
