@@ -17,7 +17,7 @@ let cart = [];
 function renderMenu() {
   menuContainer.innerHTML = "";
   menu.forEach((item, i) => {
-    if (item.hidden) return; // prato oculto não aparece
+    if (item.hidden) return; // não mostra prato oculto no cardápio público
     const div = document.createElement('div');
     div.className = "bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col items-start space-y-2 mb-6";
     const srcImg = item.image.trim() !== "" ? item.image : "https://via.placeholder.com/600x400";
@@ -89,7 +89,7 @@ whatsAppBtn.addEventListener('click', () => {
 
 adminLoginBtn.addEventListener('click', () => {
   const pwd = prompt("Digite a senha de administrador:");
-  if (pwd === "Marcelo") { // Coloque aqui sua senha
+  if (pwd === "Marcelo") { // Coloque aqui sua senha nova
     isAdmin = true;
     adminPanel.style.display = "block";
     logoutBtn.style.display = "inline-block";
@@ -110,22 +110,23 @@ function renderAdminMenu() {
   adminDishList.innerHTML = "";
   menu.forEach((item, i) => {
     const li = document.createElement('li');
+    const hiddenChecked = item.hidden ? "checked" : "";
     li.innerHTML = `
-      ${item.name} - R$ ${item.price.toFixed(2)} 
-      <button onclick="editDish(${i})" class="ml-2 px-2 py-1 bg-yellow-500 rounded">✏️</button> 
+      ${item.name} - R$ ${item.price.toFixed(2)}
+      <button onclick="editDish(${i})" class="ml-2 px-2 py-1 bg-yellow-500 rounded">✏️</button>
       <button onclick="deleteDish(${i})" class="ml-2 px-2 py-1 bg-red-600 rounded">🗑️</button>
-      <button onclick="toggleVisibility(${i})" class="ml-2 px-2 py-1 bg-gray-500 rounded">
-        ${item.hidden ? "Mostrar" : "Ocultar"}
-      </button>
+      <label class="ml-4 text-sm flex items-center space-x-1 cursor-pointer">
+        <input type="checkbox" onchange="toggleHidden(${i}, this.checked)" ${hiddenChecked} />
+        <span>Ocultar</span>
+      </label>
     `;
     adminDishList.appendChild(li);
   });
 }
 
-function toggleVisibility(i) {
-  menu[i].hidden = !menu[i].hidden;
+function toggleHidden(i, isHidden) {
+  menu[i].hidden = isHidden;
   localStorage.setItem('menu', JSON.stringify(menu));
-  renderAdminMenu();
   renderMenu();
 }
 
@@ -138,6 +139,7 @@ function addNewDish() {
     menu.push({ name: n, desc: d, price: p, image: img, hidden: false });
     localStorage.setItem('menu', JSON.stringify(menu));
     renderMenu();
+    // limpa campos
     document.getElementById('newDishName').value = '';
     document.getElementById('newDishDesc').value = '';
     document.getElementById('newDishPrice').value = '';
@@ -160,7 +162,7 @@ function editDish(i) {
 
 function deleteDish(i) {
   if (confirm("Deseja excluir este prato?")) {
-    menu.splice(i, 1);
+    menu.splice(i,1);
     localStorage.setItem('menu', JSON.stringify(menu));
     renderMenu();
   }
