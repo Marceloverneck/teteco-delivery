@@ -9,15 +9,15 @@ const adminDishList   = document.getElementById('adminDishList');
 
 let isAdmin = false;
 let menu = JSON.parse(localStorage.getItem('menu')) || [
-  { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99, image: "", visible: true },
-  { name: "Risoto de Camarão",  desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "", visible: true }
+  { name: "Churrasco Misto", desc: "Contra filé, frango, linguiça, arroz, farofa, maionese e salada.", price: 28.99, image: "", hidden: false },
+  { name: "Risoto de Camarão",  desc: "Camarão, arroz branco, creme de leite e milho (opcional).", price: 29.99, image: "", hidden: false }
 ];
 let cart = [];
 
 function renderMenu() {
   menuContainer.innerHTML = "";
   menu.forEach((item, i) => {
-    if (!item.visible) return; // não mostra prato oculto
+    if (item.hidden) return; // não mostra pratos ocultos
     const div = document.createElement('div');
     div.className = "bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col items-start space-y-2 mb-6";
     const srcImg = item.image.trim() !== "" ? item.image : "https://via.placeholder.com/600x400";
@@ -89,7 +89,7 @@ whatsAppBtn.addEventListener('click', () => {
 
 adminLoginBtn.addEventListener('click', () => {
   const pwd = prompt("Digite a senha de administrador:");
-  if (pwd === "Marcelo") { // Altere aqui sua senha
+  if (pwd === "Marcelo") { // Coloque aqui sua senha nova
     isAdmin = true;
     adminPanel.style.display = "block";
     logoutBtn.style.display = "inline-block";
@@ -114,19 +114,19 @@ function renderAdminMenu() {
       ${item.name} - R$ ${item.price.toFixed(2)} 
       <button onclick="editDish(${i})" class="ml-2 px-2 py-1 bg-yellow-500 rounded">✏️</button> 
       <button onclick="deleteDish(${i})" class="ml-2 px-2 py-1 bg-red-600 rounded">🗑️</button>
-      <button onclick="toggleVisibility(${i})" class="ml-2 px-2 py-1 ${item.visible ? 'bg-gray-500' : 'bg-green-500'} rounded">
-        ${item.visible ? 'Ocultar' : 'Mostrar'}
+      <button onclick="toggleHidden(${i})" class="ml-2 px-2 py-1 bg-gray-600 rounded">
+        ${item.hidden ? 'Mostrar' : 'Ocultar'}
       </button>
     `;
     adminDishList.appendChild(li);
   });
 }
 
-function toggleVisibility(i) {
-  menu[i].visible = !menu[i].visible;
+function toggleHidden(i) {
+  menu[i].hidden = !menu[i].hidden;
   localStorage.setItem('menu', JSON.stringify(menu));
-  renderMenu();
   renderAdminMenu();
+  renderMenu();
 }
 
 function addNewDish() {
@@ -135,7 +135,7 @@ function addNewDish() {
   const p = parseFloat(document.getElementById('newDishPrice').value);
   const img = document.getElementById('newDishImage').value.trim();
   if (n && d && !isNaN(p)) {
-    menu.push({ name: n, desc: d, price: p, image: img, visible: true });
+    menu.push({ name: n, desc: d, price: p, image: img, hidden: false });
     localStorage.setItem('menu', JSON.stringify(menu));
     renderMenu();
     document.getElementById('newDishName').value = '';
@@ -152,7 +152,7 @@ function editDish(i) {
   const d = prompt("Nova descrição:", menu[i].desc);
   const p = prompt("Novo preço:", menu[i].price);
   if (n && d && p) {
-    menu[i] = { name: n, desc: d, price: parseFloat(p), image: menu[i].image, visible: menu[i].visible };
+    menu[i] = { name: n, desc: d, price: parseFloat(p), image: menu[i].image, hidden: menu[i].hidden };
     localStorage.setItem('menu', JSON.stringify(menu));
     renderMenu();
   }
